@@ -35,12 +35,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.agarcia.myfirstandroidapp.ui.navigations.MovieDetailScreenNavigation
+import com.agarcia.myfirstandroidapp.ui.navigations.MovieListScreenNavigation
 import com.agarcia.myfirstandroidapp.ui.screens.MovieDetailScreen
 import com.agarcia.myfirstandroidapp.ui.screens.MovieListScreen
 import kotlinx.coroutines.launch
 
 @Composable
 fun CustomScaffold () {
+  val navController = rememberNavController()
   val corouteScope = rememberCoroutineScope()
   val snackbarHostState = remember { SnackbarHostState() }
 
@@ -71,9 +77,21 @@ fun CustomScaffold () {
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
-      // MovieDetailScreen(950387)
-      // MovieListScreen()
-      CustomModalBottonSheet()
+      NavHost(
+        navController = navController,
+        startDestination = MovieListScreenNavigation,
+      ) {
+        composable <MovieListScreenNavigation> {
+          val onMovieClick = { movieId: Int ->
+            navController.navigate(MovieDetailScreenNavigation(movieId))
+          }
+          MovieListScreen(onMovieClick)
+        }
+        composable <MovieDetailScreenNavigation> { backStackEntry ->
+          val movieId = backStackEntry.arguments?.getInt("id") ?: 0
+          MovieDetailScreen(movieId = movieId)
+        }
+      }
     }
   }
 }
