@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTopBar(
-  title: String = "My First Android App",
+  title: String = "¡Qué Peli!",
 ) {
   TopAppBar(
     title = { Text(text = title) },

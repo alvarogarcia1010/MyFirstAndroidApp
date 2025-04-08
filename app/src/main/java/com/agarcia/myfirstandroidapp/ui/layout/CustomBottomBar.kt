@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,9 +23,9 @@ data class NavItem(val label: String, val icon: ImageVector, val route: String)
 @Composable
 fun CustomBottomBar() {
   val navItems = listOf(
-    NavItem("Home", Icons.Filled.Home, "home"),
-    NavItem("Favorite", Icons.Filled.Favorite, "favorite"),
-    NavItem("ShoppingCart", Icons.Filled.ShoppingCart, "shoppingCart")
+    NavItem("Inicio", Icons.Filled.Home, "home"),
+    NavItem("Mis Favoritas", Icons.Filled.Favorite, "favorite"),
+    NavItem("Ya vistas", Icons.Filled.Tv, "shoppingCart")
   )
 
   var selectedItem by rememberSaveable { mutableStateOf("home") }

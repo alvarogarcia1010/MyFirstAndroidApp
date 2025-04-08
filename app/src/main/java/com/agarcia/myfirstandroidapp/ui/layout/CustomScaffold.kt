@@ -35,6 +35,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.agarcia.myfirstandroidapp.ui.screens.MovieDetailScreen
+import com.agarcia.myfirstandroidapp.ui.screens.MovieListScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,7 +56,7 @@ fun CustomScaffold () {
 
   Scaffold(
     topBar = {
-      CustomTopBar("My First Android App")
+      CustomTopBar("¡Qué Peli!")
     },
     bottomBar = { CustomBottomBar() },
     floatingActionButton = {
@@ -69,6 +71,8 @@ fun CustomScaffold () {
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ) {
+      // MovieDetailScreen(950387)
+      // MovieListScreen()
       CustomModalBottonSheet()
     }
   }
