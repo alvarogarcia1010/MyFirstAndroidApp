@@ -2,6 +2,8 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -49,6 +51,8 @@ dependencies {
   implementation(libs.androidx.material.icons.extended)
   implementation(libs.coil.compose)
   implementation(libs.coil.network.okhttp)
+  implementation(libs.navigation.compose)
+  implementation(libs.kotlinx.serialization.json)
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
