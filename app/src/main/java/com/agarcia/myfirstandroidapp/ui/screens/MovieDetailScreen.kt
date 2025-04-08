@@ -32,7 +32,17 @@ import com.agarcia.myfirstandroidapp.data.dummy.movies
 import com.agarcia.myfirstandroidapp.helpers.formatLongDate
 
 @Composable
-fun MovieDetailScreen(movieId: Int) {
+fun MovieDetailScreen(movieId: Int?) {
+  if (movieId == null) {
+    Box(
+      modifier = Modifier.fillMaxSize(),
+      contentAlignment = Alignment.Center
+    ) {
+      Text("Película no encontrada", style = MaterialTheme.typography.titleLarge)
+    }
+    return
+  }
+
   val scrollState = rememberScrollState()
   val movie = movies.firstOrNull { it.id == movieId }
 
