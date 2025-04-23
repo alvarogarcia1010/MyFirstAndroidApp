@@ -6,4 +6,10 @@ import kotlinx.serialization.Serializable
 object MovieListScreenNavigation
 
 @Serializable
+object MyFavoritesScreenNavigation
+
+@Serializable
+object UpCommingScreenNavigation
+
+@Serializable
 data class MovieDetailScreenNavigation(val id: Int)
