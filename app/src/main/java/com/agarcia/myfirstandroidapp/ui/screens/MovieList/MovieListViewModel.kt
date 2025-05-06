@@ -19,6 +19,13 @@ class MovieListViewModel: ViewModel() {
   private val _loading = MutableStateFlow<Boolean>(false)
   val loading : StateFlow<Boolean> = _loading
 
+  private val _isLinearLayout = MutableStateFlow<Boolean>(true)
+  val isLinearLayout : StateFlow<Boolean> = _isLinearLayout
+
+  fun changeLayoutPreferences(isLinearLayout: Boolean) {
+    _isLinearLayout.value = isLinearLayout
+  }
+
   fun loadMovies () {
     viewModelScope.launch {
       _loading.value = true
