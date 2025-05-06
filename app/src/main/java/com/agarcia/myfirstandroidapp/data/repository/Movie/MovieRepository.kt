@@ -1,4 +1,4 @@
-package com.agarcia.myfirstandroidapp.data.repository
+package com.agarcia.myfirstandroidapp.data.repository.Movie
 
 import com.agarcia.myfirstandroidapp.data.model.Movie
 

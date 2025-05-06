@@ -53,6 +53,8 @@ dependencies {
   implementation(libs.coil.network.okhttp)
   implementation(libs.navigation.compose)
   implementation(libs.kotlinx.serialization.json)
+  implementation(libs.datastore.preferences)
+  implementation(libs.androidx.benchmark.common)
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)

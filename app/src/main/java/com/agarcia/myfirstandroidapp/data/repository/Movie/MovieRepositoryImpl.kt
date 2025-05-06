@@ -1,10 +1,10 @@
-package com.agarcia.myfirstandroidapp.data.repository
+package com.agarcia.myfirstandroidapp.data.repository.Movie
 
 import com.agarcia.myfirstandroidapp.data.dummy.dummyMovies
 import com.agarcia.myfirstandroidapp.data.model.Movie
 import kotlinx.coroutines.delay
 
-class MovieRepositoryImpl:MovieRepository {
+class MovieRepositoryImpl: MovieRepository {
     override suspend fun getMovies(): List<Movie> {
       delay(3000) // Simulate network delay
       return dummyMovies

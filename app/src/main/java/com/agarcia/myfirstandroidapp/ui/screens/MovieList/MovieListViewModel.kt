@@ -1,17 +1,26 @@
 package com.agarcia.myfirstandroidapp.ui.screens.MovieList
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import com.agarcia.myfirstandroidapp.data.dummy.dummyMovies
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.agarcia.myfirstandroidapp.MyFirstAndroidAppAplication
 import com.agarcia.myfirstandroidapp.data.model.Movie
-import com.agarcia.myfirstandroidapp.data.repository.MovieRepository
-import com.agarcia.myfirstandroidapp.data.repository.MovieRepositoryImpl
+import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepository
+import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepositoryImpl
+import com.agarcia.myfirstandroidapp.data.repository.Settings.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class MovieListViewModel: ViewModel() {
+class MovieListViewModel(
+  private val userPreferencesRepository: UserPreferencesRepository
+): ViewModel() {
   val movieRepository: MovieRepository = MovieRepositoryImpl()
 
   private val _movies = MutableStateFlow<List<Movie>>(emptyList())
@@ -19,6 +28,14 @@ class MovieListViewModel: ViewModel() {
 
   private val _loading = MutableStateFlow<Boolean>(false)
   val loading: StateFlow<Boolean> = _loading
+
+  val isLinearLayout: StateFlow<Boolean> =
+    userPreferencesRepository.isLinearLayout.map { it }
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = true
+    )
 
   fun loadMovies() {
     _loading.value = true
@@ -28,7 +45,18 @@ class MovieListViewModel: ViewModel() {
     }
   }
 
-  fun loadMovies2() {
-    _movies.value = dummyMovies
+  fun changeLayoutPreferences(isLinearLayout: Boolean) {
+    viewModelScope.launch {
+      userPreferencesRepository.saveLayoutPreference(isLinearLayout)
+    }
+  }
+
+  companion object {
+    val Factory: ViewModelProvider.Factory = viewModelFactory {
+      initializer {
+        val application = (this[APPLICATION_KEY] as MyFirstAndroidAppAplication)
+        MovieListViewModel(application.userPreferencesRepository)
+      }
+    }
   }
 }
