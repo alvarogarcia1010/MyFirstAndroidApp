@@ -38,7 +38,7 @@ import com.agarcia.myfirstandroidapp.ui.components.MoviePoster
 @Composable
 fun MovieListScreen(
   onMovieClick : (Int) -> Unit = {},
-  viewModel: MovieListViewModel = viewModel()
+  viewModel: MovieListViewModel = viewModel(factory = MovieListViewModel.Factory)
 ){
   val movies by viewModel.movies.collectAsState()
   val loading by viewModel.loading.collectAsState()
