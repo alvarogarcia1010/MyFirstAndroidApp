@@ -1,6 +1,5 @@
 package com.agarcia.myfirstandroidapp.ui.screens.MovieList
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,12 +17,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -108,11 +104,15 @@ fun MovieListScreen(
       horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
       items(movies) { movie ->
-        MoviePoster(movie = movie, onMovieClick = onMovieClick)
+        val isFavorite by viewModel.isFavorite(movie.id).collectAsState(false)
+        MoviePoster(
+          movie = movie,
+          isFavorite = isFavorite,
+          onMovieClick = onMovieClick,
+          onFavoriteClick = { viewModel.toggleFavorite(movie) }
+        )
       }
     }
-
-
   }
 }
 
