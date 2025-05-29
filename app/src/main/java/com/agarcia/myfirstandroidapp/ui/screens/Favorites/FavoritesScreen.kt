@@ -14,6 +14,7 @@ import com.agarcia.myfirstandroidapp.ui.components.MoviePoster
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.agarcia.myfirstandroidapp.data.model.toMovie
 
 
@@ -21,7 +22,7 @@ import com.agarcia.myfirstandroidapp.data.model.toMovie
 fun Favorites(
   favoritesViewModel: FavoritesViewModel = viewModel(factory = FavoritesViewModel.Factory)
 ) {
-  val favoriteMovies by favoritesViewModel.favoriteMovies.collectAsState(emptyList())
+  val favoriteMovies by favoritesViewModel.favoriteMovies.collectAsStateWithLifecycle(emptyList())
 
   LazyVerticalGrid(
     columns = GridCells.Fixed(3),
@@ -31,10 +32,9 @@ fun Favorites(
     modifier = Modifier.fillMaxSize().padding(16.dp)
   ) {
     items(favoriteMovies) { movie ->
-      val isFavorite by favoritesViewModel.isFavorite(movie.id).collectAsState(false)
       MoviePoster(
         movie = movie.toMovie(),
-        isFavorite = isFavorite,
+        isFavorite = true,
         onMovieClick = {},
         onFavoriteClick = { favoritesViewModel.toggleFavorite(movie) }
 

@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -104,7 +105,8 @@ fun MoviesGridLayout (movies: List<Movie>, onMovieClick: (Int) -> Unit, viewMode
     horizontalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     items(movies) { movie ->
-      val isFavorite by viewModel.isFavoriteMovie(movie.id).collectAsState(initial = false)
+      val isFavoriteMovie = remember(movie.id) { viewModel.isFavoriteMovie(movie.id) }
+      val isFavorite by isFavoriteMovie.collectAsState(initial = false)
       MoviePoster(
         movie = movie,
         onMovieClick = onMovieClick,

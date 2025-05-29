@@ -19,7 +19,12 @@ import kotlinx.coroutines.launch
 class FavoritesViewModel(
   private val favoriteMovieRepository: FavoriteMovieRepository
 ):ViewModel() {
-  val favoriteMovies: Flow<List<FavoriteMovie>> = favoriteMovieRepository.getFavoritesMovies()
+  val favoriteMovies: StateFlow<List<FavoriteMovie>> = favoriteMovieRepository.getFavoritesMovies()
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = emptyList()
+    )
 
   fun isFavorite(movieId: Int): StateFlow<Boolean> {
     return favoriteMovieRepository.isFavorite(movieId)
