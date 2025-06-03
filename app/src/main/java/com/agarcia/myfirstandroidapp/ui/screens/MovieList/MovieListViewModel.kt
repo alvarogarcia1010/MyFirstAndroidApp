@@ -24,10 +24,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MovieListViewModel(
+  private val movieRepository: MovieRepository,
   private val userPreferenceRepository: UserPreferencesRepository,
   private val favoriteMovieRepository: FavoriteMovieRepository
 ): ViewModel() {
-  val movieRepository:MovieRepository = MovieRepositoryImpl()
 
   private val _movies = MutableStateFlow<List<Movie>>(emptyList())
   val movies: StateFlow<List<Movie>> = _movies
@@ -82,6 +82,7 @@ class MovieListViewModel(
       initializer {
         val aplication = this[APPLICATION_KEY] as MyFirstAndroidAppAplication
         MovieListViewModel(
+          aplication.appProvider.providerMovieRepository(),
           aplication.appProvider.provideUserPreferenceRepository(),
           aplication.appProvider.provideFavoriteMovieRepository()
         )

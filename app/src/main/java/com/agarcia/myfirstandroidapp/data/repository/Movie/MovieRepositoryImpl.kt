@@ -1,13 +1,14 @@
 package com.agarcia.myfirstandroidapp.data.repository.Movie
 
-import com.agarcia.myfirstandroidapp.data.dummy.dummyMovies
 import com.agarcia.myfirstandroidapp.data.model.Movie
-import kotlinx.coroutines.delay
+import com.agarcia.myfirstandroidapp.data.remote.Movie.MovieService
+import com.agarcia.myfirstandroidapp.data.remote.Movie.toDomain
 
-class MovieRepositoryImpl:MovieRepository {
+class MovieRepositoryImpl(
+  private val movieService: MovieService
+):MovieRepository {
 
   override suspend fun getMovies(): List<Movie> {
-    delay(2000)
-    return dummyMovies
+    return movieService.getPopularMovies().result.map { it.toDomain() }
   }
 }
