@@ -5,8 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.agarcia.myfirstandroidapp.data.database.AppDatabase
+import com.agarcia.myfirstandroidapp.data.remote.RetrofitInstance
 import com.agarcia.myfirstandroidapp.data.repository.FavoriteMovie.FavoriteMovieRepository
 import com.agarcia.myfirstandroidapp.data.repository.FavoriteMovie.FavoriteMovieRepositoryImpl
+import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepository
+import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepositoryImpl
 import com.agarcia.myfirstandroidapp.data.repository.Settings.UserPreferencesRepository
 import com.agarcia.myfirstandroidapp.data.repository.Settings.UserPreferencesRepositoryImpl
 
@@ -20,11 +23,18 @@ class AppProvider(context: Context) {
 
   private val userPreferenceRepository: UserPreferencesRepository = UserPreferencesRepositoryImpl(context.dataStore)
 
+  private val movieService = RetrofitInstance.movieService
+  private val movieRepository = MovieRepositoryImpl(movieService)
+
   fun provideFavoriteMovieRepository() : FavoriteMovieRepository {
     return favoriteMovieRepository
   }
 
   fun provideUserPreferenceRepository() : UserPreferencesRepository {
     return userPreferenceRepository
+  }
+
+  fun provideMovieRepository() : MovieRepository {
+    return movieRepository
   }
 }
