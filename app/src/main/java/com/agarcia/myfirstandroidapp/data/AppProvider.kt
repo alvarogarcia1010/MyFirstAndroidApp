@@ -24,7 +24,8 @@ class AppProvider(context: Context) {
   private val userPreferenceRepository: UserPreferencesRepository = UserPreferencesRepositoryImpl(context.dataStore)
 
   private val movieService = RetrofitInstance.movieService
-  private val movieRepository: MovieRepository = MovieRepositoryImpl(movieService)
+  private val movieDao = appDatabase.movieDao()
+  private val movieRepository: MovieRepository = MovieRepositoryImpl(movieDao, movieService)
 
   fun provideFavoriteMovieRepository() : FavoriteMovieRepository {
     return favoriteMovieRepository

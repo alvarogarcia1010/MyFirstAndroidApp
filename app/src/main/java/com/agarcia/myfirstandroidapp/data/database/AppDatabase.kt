@@ -5,14 +5,17 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.agarcia.myfirstandroidapp.data.database.dao.FavoriteMovieDao
+import com.agarcia.myfirstandroidapp.data.database.dao.MovieDao
 import com.agarcia.myfirstandroidapp.data.database.entities.FavoriteMovieEntity
+import com.agarcia.myfirstandroidapp.data.database.entities.MovieEntity
 
 @Database(
-  entities = [FavoriteMovieEntity::class],
+  entities = [MovieEntity::class, FavoriteMovieEntity::class],
   version = 1,
   exportSchema = false
 )
 abstract class AppDatabase: RoomDatabase() {
+  abstract fun movieDao(): MovieDao
   abstract fun favoriteMovieDao(): FavoriteMovieDao
 
   companion object {
