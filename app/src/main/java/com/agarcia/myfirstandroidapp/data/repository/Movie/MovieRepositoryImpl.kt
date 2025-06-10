@@ -1,13 +1,19 @@
 package com.agarcia.myfirstandroidapp.data.repository.Movie
 
 import com.agarcia.myfirstandroidapp.data.database.dao.MovieDao
-import com.agarcia.myfirstandroidapp.data.database.entities.toDomain
 import com.agarcia.myfirstandroidapp.data.model.Movie
 import com.agarcia.myfirstandroidapp.data.remote.Movie.MovieService
-import com.agarcia.myfirstandroidapp.data.remote.Movie.toDomain
 import com.agarcia.myfirstandroidapp.data.remote.Movie.toEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import android.util.Log
+import com.agarcia.myfirstandroidapp.data.database.entities.toDomain
+import com.agarcia.myfirstandroidapp.helpers.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 class MovieRepositoryImpl(
@@ -15,17 +21,30 @@ class MovieRepositoryImpl(
   private val movieService: MovieService
 ):MovieRepository {
 
-  override suspend fun getMovies(): List<Movie> {
+  override fun getMovies (): Flow<Resource<List<Movie>>> = flow {
+   emit(Resource.Loading)
     try {
-      var movies = movieService.getPopularMovies().result
-      if (movies.isNotEmpty()) {
-        movieDao.insertMovies(movies.map { it.toEntity() })
-      }
+      val remoteMovies = movieService.getPopularMovies().result
 
-      return movieDao.getMovies().first().map { it.toDomain() }
+      if (remoteMovies.isNotEmpty()) {
+        movieDao.insertMovies(remoteMovies.map { it.toEntity() })
+      }
     }
     catch (e: Exception) {
-      return movieDao.getMovies().first().map { it.toDomain() }
+      Log.e("MovieRepository", "Error fetching movies from remote: ${e.message}")
     }
-  }
+
+    val localMoviesFlow =  movieDao.getMovies()
+        .map { entities ->
+          val movies = entities.map { it.toDomain() }
+
+          when {
+            movies.isNotEmpty() -> Resource.Success(movies)
+            else -> Resource.Error("No movies found")
+          }
+        }.distinctUntilChanged()
+
+
+    emitAll(localMoviesFlow)
+    }.flowOn(Dispatchers.IO)
 }

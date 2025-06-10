@@ -8,13 +8,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.agarcia.myfirstandroidapp.MyFirstAndroidAppAplication
-import com.agarcia.myfirstandroidapp.data.dummy.dummyMovies
 import com.agarcia.myfirstandroidapp.data.model.Movie
 import com.agarcia.myfirstandroidapp.data.model.toFavoriteMovie
 import com.agarcia.myfirstandroidapp.data.repository.FavoriteMovie.FavoriteMovieRepository
 import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepository
-import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepositoryImpl
 import com.agarcia.myfirstandroidapp.data.repository.Settings.UserPreferencesRepository
+import com.agarcia.myfirstandroidapp.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +34,9 @@ class MovieListViewModel(
   private val _loading = MutableStateFlow<Boolean>(false)
   val loading : StateFlow<Boolean> = _loading
 
+  private val _refreshing = MutableStateFlow<Boolean>(false)
+  val refreshing : StateFlow<Boolean> = _refreshing
+
   val isLinearLayout : StateFlow<Boolean> = userPreferenceRepository.isLinearLayout.map { it }
     .stateIn(
       scope = viewModelScope,
@@ -48,11 +50,30 @@ class MovieListViewModel(
     }
   }
 
-  fun loadMovies () {
+  fun loadMovies (isRefresh: Boolean = false) {
     viewModelScope.launch {
-      _loading.value = true
-      _movies.value = movieRepository.getMovies()
-      _loading.value = false
+      movieRepository.getMovies().collect { result ->
+        when (result) {
+          is Resource.Loading -> {
+            if (isRefresh) {
+              _refreshing.value = true
+            } else {
+              _loading.value = true
+            }
+          }
+          is Resource.Success -> {
+            _movies.value = result.data
+            _loading.value = false
+            _refreshing.value = false
+            Log.d("MovieListViewModel", "Loaded ${result.data.size} movies")
+          }
+          is Resource.Error -> {
+            _loading.value = false
+            _refreshing.value = false
+            Log.e("MovieListViewModel", "Error: ${result.message}")
+          }
+        }
+      }
     }
   }
 

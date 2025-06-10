@@ -19,9 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,7 +38,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agarcia.myfirstandroidapp.data.model.Movie
 import com.agarcia.myfirstandroidapp.ui.components.MovieItem
 import com.agarcia.myfirstandroidapp.ui.components.MoviePoster
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieListScreen(
   onMovieClick : (Int) -> Unit = {},
@@ -43,7 +49,10 @@ fun MovieListScreen(
 ){
   val movies by viewModel.movies.collectAsState()
   val loading by viewModel.loading.collectAsState()
+  val isRefreshing by viewModel.refreshing.collectAsState()
   val isLinearLayout by viewModel.isLinearLayout.collectAsState()
+
+  val refreshState = rememberPullToRefreshState( )
 
   LaunchedEffect(Unit) {
     viewModel.loadMovies()
@@ -79,40 +88,72 @@ fun MovieListScreen(
     }
 
     if (isLinearLayout) {
-      MoviesLinearLayout(movies, onMovieClick)
-    } else {
-      MoviesGridLayout(movies, onMovieClick, viewModel)
-    }
-  }
-}
-
-@Composable
-fun MoviesLinearLayout (movies: List<Movie>, onMovieClick: (Int) -> Unit) {
-  LazyColumn() {
-    items(movies) { movie ->
-      MovieItem(movie = movie, onMovieClick = onMovieClick)
-      Spacer(modifier = Modifier.height(16.dp))
-    }
-  }
-}
-
-@Composable
-fun MoviesGridLayout (movies: List<Movie>, onMovieClick: (Int) -> Unit, viewModel: MovieListViewModel) {
-  LazyVerticalGrid(
-    columns = GridCells.Fixed(3),
-    contentPadding = PaddingValues(0.dp),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp)
-  ) {
-    items(movies) { movie ->
-      val isFavoriteMovie = remember(movie.id) { viewModel.isFavoriteMovie(movie.id) }
-      val isFavorite by isFavoriteMovie.collectAsState(initial = false)
-      MoviePoster(
-        movie = movie,
-        onMovieClick = onMovieClick,
-        isFavorite = isFavorite,
-        onFavoriteClick = { viewModel.toggleFavoriteMovie(movie) }
+      MoviesLinearLayout(
+        movies,
+        onMovieClick,
+        viewModel,
+        refreshState,
+        isRefreshing
       )
+    } else {
+      MoviesGridLayout(
+        movies,
+        onMovieClick,
+        viewModel,
+        refreshState,
+        isRefreshing
+        )
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MoviesLinearLayout (movies: List<Movie>, onMovieClick: (Int) -> Unit, viewModel: MovieListViewModel, refreshState: PullToRefreshState, isRefreshing: Boolean) {
+  PullToRefreshBox(
+    state = refreshState,
+    modifier = Modifier.fillMaxSize(),
+    isRefreshing = isRefreshing,
+    onRefresh = {
+      viewModel.loadMovies(isRefresh = true)
+    }
+  ) {
+    LazyColumn() {
+      items(movies) { movie ->
+        MovieItem(movie = movie, onMovieClick = onMovieClick)
+        Spacer(modifier = Modifier.height(16.dp))
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MoviesGridLayout (movies: List<Movie>, onMovieClick: (Int) -> Unit, viewModel: MovieListViewModel, refreshState: PullToRefreshState, isRefreshing: Boolean) {
+  PullToRefreshBox(
+    state = refreshState,
+    modifier = Modifier.fillMaxSize(),
+    isRefreshing = isRefreshing,
+    onRefresh = {
+      viewModel.loadMovies(isRefresh = true)
+    }
+  ) {
+    LazyVerticalGrid(
+      columns = GridCells.Fixed(3),
+      contentPadding = PaddingValues(0.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      items(movies) { movie ->
+        val isFavoriteMovie = remember(movie.id) { viewModel.isFavoriteMovie(movie.id) }
+        val isFavorite by isFavoriteMovie.collectAsState(initial = false)
+        MoviePoster(
+          movie = movie,
+          onMovieClick = onMovieClick,
+          isFavorite = isFavorite,
+          onFavoriteClick = { viewModel.toggleFavoriteMovie(movie) }
+        )
+      }
     }
   }
 }
