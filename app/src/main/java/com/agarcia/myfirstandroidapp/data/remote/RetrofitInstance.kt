@@ -1,5 +1,7 @@
 package com.agarcia.myfirstandroidapp.data.remote
 
+import com.agarcia.myfirstandroidapp.BuildConfig
+import com.agarcia.myfirstandroidapp.data.remote.Interceptors.AuthInterceptor
 import com.agarcia.myfirstandroidapp.data.remote.Movie.MovieService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -13,6 +15,7 @@ object RetrofitInstance {
     .addInterceptor(HttpLoggingInterceptor().apply {
       level = HttpLoggingInterceptor.Level.BODY
     })
+    .addInterceptor(AuthInterceptor { BuildConfig.API_TOKEN })
     .build()
 
   private val retrofit: Retrofit = Retrofit.Builder()

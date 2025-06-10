@@ -1,5 +1,6 @@
 package com.agarcia.myfirstandroidapp.data.remote.Responses
 
+import com.agarcia.myfirstandroidapp.data.database.entities.MovieEntity
 import com.agarcia.myfirstandroidapp.data.model.Movie
 
 data class MovieResponse(
@@ -37,3 +38,22 @@ fun MovieResponse.toDomain(): Movie {
         posterUrl = "https://image.tmdb.org/t/p/w500$poster_path"
     )
 }
+
+fun MovieResponse.toEntity(): MovieEntity {
+    return MovieEntity(
+        id = id,
+        title = title,
+        original_title = original_title,
+        original_language = original_language,
+        overview = overview,
+        release_date = release_date,
+        adult = adult,
+        popularity = popularity,
+        vote_average = vote_average,
+        vote_count = vote_count,
+        video = video,
+        backdrop_path = backdrop_path,
+        poster_path = poster_path,
+    )
+}
+

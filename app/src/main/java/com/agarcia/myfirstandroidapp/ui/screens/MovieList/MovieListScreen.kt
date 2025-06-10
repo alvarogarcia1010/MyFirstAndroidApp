@@ -1,6 +1,5 @@
 package com.agarcia.myfirstandroidapp.ui.screens.MovieList
 
-import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,6 +38,7 @@ import com.agarcia.myfirstandroidapp.data.model.Movie
 import com.agarcia.myfirstandroidapp.ui.components.MovieItem
 import com.agarcia.myfirstandroidapp.ui.components.MoviePoster
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieListScreen(
   onMovieClick : (Int) -> Unit = {},
@@ -43,7 +46,10 @@ fun MovieListScreen(
 ){
   val movies by viewModel.movies.collectAsState()
   val loading by viewModel.loading.collectAsState()
+  val isRefreshing by viewModel.isRefreshing.collectAsState()
   val isLinearLayout by viewModel.isLinearLayout.collectAsState()
+
+  val pullToRefreshState = rememberPullToRefreshState()
 
   LaunchedEffect(Unit) {
     viewModel.loadMovies()
@@ -78,10 +84,16 @@ fun MovieListScreen(
       )
     }
 
-    if (isLinearLayout) {
-      MoviesLinearLayout(movies, onMovieClick)
-    } else {
-      MoviesGridLayout(movies, onMovieClick, viewModel)
+    PullToRefreshBox(
+      state = pullToRefreshState,
+      isRefreshing = isRefreshing,
+      onRefresh = { viewModel.loadMovies(true) },
+    ) {
+      if (isLinearLayout) {
+        MoviesLinearLayout(movies, onMovieClick)
+      } else {
+        MoviesGridLayout(movies, onMovieClick, viewModel)
+      }
     }
   }
 }

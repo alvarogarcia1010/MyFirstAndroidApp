@@ -15,6 +15,7 @@ import com.agarcia.myfirstandroidapp.data.repository.FavoriteMovie.FavoriteMovie
 import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepository
 import com.agarcia.myfirstandroidapp.data.repository.Movie.MovieRepositoryImpl
 import com.agarcia.myfirstandroidapp.data.repository.Settings.UserPreferencesRepository
+import com.agarcia.myfirstandroidapp.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,9 @@ class MovieListViewModel(
   private val _loading = MutableStateFlow<Boolean>(false)
   val loading : StateFlow<Boolean> = _loading
 
+  private val _isRefreshing = MutableStateFlow<Boolean>(false)
+  val isRefreshing : StateFlow<Boolean> = _isRefreshing
+
   val isLinearLayout : StateFlow<Boolean> = userPreferenceRepository.isLinearLayout.map { it }
     .stateIn(
       scope = viewModelScope,
@@ -48,11 +52,29 @@ class MovieListViewModel(
     }
   }
 
-  fun loadMovies () {
+  fun loadMovies (isRefreshing: Boolean = false) {
     viewModelScope.launch {
-      _loading.value = true
-      _movies.value = movieRepository.getMovies()
-      _loading.value = false
+      movieRepository.getMovies().collect({ resource ->
+        when (resource) {
+          is Resource.Loading -> {
+            if (isRefreshing) {
+              _isRefreshing.value = true
+            } else {
+              _loading.value = true
+            }
+          }
+          is Resource.Success -> {
+            _movies.value = resource.data
+            _loading.value = false
+            _isRefreshing.value = false
+          }
+          is Resource.Error -> {
+            _loading.value = false
+            _isRefreshing.value = false
+          }
+        }
+
+      })
     }
   }
 

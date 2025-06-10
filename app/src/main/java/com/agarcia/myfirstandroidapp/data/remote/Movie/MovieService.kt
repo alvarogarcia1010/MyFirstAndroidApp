@@ -7,7 +7,5 @@ import retrofit2.http.Header
 
 interface MovieService {
   @GET("movie/popular?language=es-SV&page=1")
-  suspend fun getPopularMovies(
-    @Header("Authorization") token: String
-  ) : BaseResponse<MovieResponse>
+  suspend fun getPopularMovies() : BaseResponse<MovieResponse>
 }
